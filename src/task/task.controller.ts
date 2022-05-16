@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put } from '@nestjs/common';
 import { CreateTaskDTO } from '../dto/create-task.dto';
 import { TaskService } from './task.service';
 import { UpdateTaskDTO } from '../dto/update-task.dto';
@@ -36,6 +36,12 @@ export class TaskController {
 
         return resp;
 
+    }
+
+    @Delete("/:id")
+    @HttpCode(HttpStatus.NO_CONTENT)
+    public async deleteOne(@Param("id") taskId: number){
+        await this.taskService.deleteOne(taskId)
     }
 
 }

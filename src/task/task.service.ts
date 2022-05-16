@@ -8,7 +8,7 @@ import { UpdateTaskDTO } from 'src/dto/update-task.dto';
 
 @Injectable()
 export class TaskService {
-    
+
     constructor(@InjectRepository(Task) private taskRepository: Repository<Task>) {}
 
     public async getOne(taskId: number){
@@ -71,4 +71,15 @@ export class TaskService {
 
        return taskDTO;
     }
+
+    public async deleteOne(taskId: number) {
+        // fetch and check if the task exists
+        const task: Task = await this.getOne(taskId);
+
+        // delete the task
+        await this.taskRepository.remove(task);
+    }
+    
+
+
 }
