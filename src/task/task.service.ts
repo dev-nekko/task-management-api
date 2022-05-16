@@ -1,14 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Task, TaskStatus } from '../entity/task.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateTaskDTO } from '../dto/create-task.dto'
 import { TaskDTO } from 'src/dto/task.dto';
+import { UpdateTaskDTO } from 'src/dto/update-task.dto';
 
 @Injectable()
 export class TaskService {
+    
     constructor(@InjectRepository(Task) private taskRepository: Repository<Task>) {}
 
+    public async getOne(taskId: number){
+        const task: Task = await this.taskRepository.findOne(taskId);
+        if(!task) throw new NotFoundException('Task with the id ${taskId} was not found');
+        
+        const taskDTO: TaskDTO = this.entityToDTO(task);
+
+        return taskDTO
+    }
+    
     public async createOne(createTaskRequest: CreateTaskDTO){
         const task: Task = new Task();
         task.title = createTaskRequest.title;
@@ -41,5 +52,23 @@ export class TaskService {
         return tasksDTO;
 
 
+    }
+
+    public async updateOne(taskId: number, updateTaskRequest: UpdateTaskDTO) {
+       //Check if the id task exist 
+       const task: Task = await this.getOne(taskId);
+
+       //Check the content are set in the dto
+        task.title = updateTaskRequest.title || task.title;
+        task.description = updateTaskRequest.description || task.description;
+        task.status = updateTaskRequest.status || task.status;
+
+       //Update the content on the task
+       await this.taskRepository.save(task);
+
+       //return the task as a dto
+       const taskDTO: TaskDTO = this.entityToDTO(task);
+
+       return taskDTO;
     }
 }
