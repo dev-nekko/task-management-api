@@ -17,6 +17,13 @@ export class TaskService {
 
         await this.taskRepository.save(task);
 
+        const taskDTO = this.entityToDTO(task);
+
+        return taskDTO;
+
+    }
+
+    private entityToDTO(task: Task): TaskDTO{
         const taskDTO = new TaskDTO();
         taskDTO.id = task.id;
         taskDTO.title = task.title;
@@ -24,6 +31,15 @@ export class TaskService {
         taskDTO.status = task.status;
 
         return taskDTO;
+    }
+
+    public async getAll(){
+        const tasks: Task[] = await this.taskRepository.find();
+
+        const tasksDTO: TaskDTO[] = tasks.map(x => this.entityToDTO(x));
+
+        return tasksDTO;
+
 
     }
 }
